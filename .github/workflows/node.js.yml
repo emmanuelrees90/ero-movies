@@ -1,9 +1,10 @@
-name: publish-to-github-pages
+name: Deploy Next.js site to Pages
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -17,31 +18,42 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: 🛎️ Checkout code
+      - name: 🛎️ Checkout
         uses: actions/checkout@v4
 
-      - name: ⚙️ Setup Node.js and install dependencies
+      - name: ⚙️ Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: 18
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: 📦 Install dependencies
         run: npm ci
 
-      - name: ⚙️ Setup Pages
-        uses: actions/configure-pages@v4
+      - name: ⚙️ Setup GitHub Pages
+        id: setup_pages
+        uses: actions/configure-pages@v5
 
-      - name: Build static site
+      - name: 💾 Restore build cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            .next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
+
+      - name: 🏗️ Build with Next.js
         run: npm run build
+        env:
+          PAGES_BASE_PATH: ${{ steps.setup_pages.outputs.base_path }}
 
-      - name: Upload static export to GitHub Pages
+      - name: 📡 Upload static site
         uses: actions/upload-pages-artifact@v3
         with:
-          path: out
-          
+          path: ./out
+
   deploy:
     environment:
       name: github-pages
