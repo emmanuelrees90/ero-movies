@@ -4,6 +4,7 @@ import Head from 'next/head';
 import { MovieDetailsPageProps, Movie } from '@/lib/types/movieType';
 import Image from 'next/image';
 
+
 export default function MovieDetailsPage({ movie, error }: MovieDetailsPageProps) {
     const router = useRouter();
 
@@ -34,12 +35,12 @@ export default function MovieDetailsPage({ movie, error }: MovieDetailsPageProps
                 <title>{movie.title} | Movie Explorer</title>
             </Head>
 
-            <main className="px-4 py-6 sm:px-6 md:px-10 bg-white min-h-[80vh]">
-                <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+            <main className="px-4 py-8 sm:px-6 md:px-10 bg-white min-h-[80vh]">
+                <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
                     <div className="w-full flex justify-center">
                         <Image
                             src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                            alt={movie.title}
+                            alt={`Poster of ${movie.title}`}
                             width={320}
                             height={480}
                             className="rounded-lg shadow-md object-cover w-full max-w-xs"
@@ -48,18 +49,20 @@ export default function MovieDetailsPage({ movie, error }: MovieDetailsPageProps
                     </div>
 
                     <div className="md:col-span-2">
-                        <h1 className="text-3xl md:text-4xl font-bold text-blue-700 mb-2">
+                        <h1 className="text-3xl md:text-4xl font-bold text-blue-700 mb-3">
                             {movie.title}
                         </h1>
-                        <p className="text-gray-600 text-sm mb-1">
+
+                        <p className="text-gray-600 text-sm mb-2">
                             <strong>Released:</strong> {movie.release_date} &nbsp; | &nbsp;
                             <strong>Runtime:</strong> {movie.runtime} mins
                         </p>
-                        <p className="text-yellow-500 text-base mb-2">
+
+                        <p className="text-yellow-500 text-base mb-3">
                             ⭐ {movie.vote_average?.toFixed(1)}
                         </p>
 
-                        <div className="flex flex-wrap gap-2 my-4">
+                        <div className="flex flex-wrap gap-2 mb-5">
                             {movie?.genres?.length > 0 ? (
                                 movie.genres.map(g => (
                                     <span
