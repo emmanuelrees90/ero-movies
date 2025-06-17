@@ -7,6 +7,8 @@ import { useSearch } from '@/lib/context/SearchContext';
 import { Movie, MovieApiResponse } from '@/lib/types/movieType';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image'
+
 
 export default function MovieGrid() {
     const [movies, setMovies] = useState<Movie[]>([]);
@@ -95,10 +97,12 @@ export default function MovieGrid() {
                                 className="group relative cursor-pointer overflow-hidden rounded-lg"
                             >
                                 {movie.poster_path ? (
-                                    <img
+                                    <Image
                                         src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
                                         alt={movie.title}
-                                        className="w-full h-auto rounded"
+                                        width={200}
+                                        height={300}
+                                        className="w-full h-auto rounded object-cover"
                                     />
                                 ) : (
                                     <div className="w-full h-60 bg-gray-200 flex items-center justify-center text-gray-500">
