@@ -1,10 +1,3 @@
-/**
- * @file MovieDetailsPage
- * @description Renders detailed information for a single movie, fetched at build time using getStaticProps.
- * Compatible with static export and fallback rendering for GitHub Pages.
- *
- */
-
 import { GetStaticPaths, GetStaticProps } from 'next';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
@@ -55,8 +48,9 @@ export default function MovieDetailsPage({ movie, error }: MovieDetailsPageProps
                         Released: {movie.release_date} | Runtime: {movie.runtime} mins
                     </p>
                     <p className="text-yellow-500 mt-1">⭐ {movie.vote_average?.toFixed(1)}</p>
+
                     <div className="mt-2 flex gap-2 flex-wrap">
-                        {Array.isArray(movie.genres) &&
+                        {movie?.genres?.length > 0 ? (
                             movie.genres.map(g => (
                                 <span
                                     key={g.id}
@@ -64,8 +58,12 @@ export default function MovieDetailsPage({ movie, error }: MovieDetailsPageProps
                                 >
                                     {g.name}
                                 </span>
-                            ))}
+                            ))
+                        ) : (
+                            <span className="text-sm text-gray-400">No genres available</span>
+                        )}
                     </div>
+
                     <p className="mt-4 text-gray-800">{movie.overview}</p>
                     <button
                         onClick={() => router.back()}
@@ -82,19 +80,27 @@ export default function MovieDetailsPage({ movie, error }: MovieDetailsPageProps
 export const getStaticPaths: GetStaticPaths = async () => {
     const apiKey = process.env.NEXT_PUBLIC_TMDB_API_KEY;
 
-    const res = await fetch(
-        `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=en-US&page=1`,
-    );
-    const data = await res.json();
+    try {
+        const res = await fetch(
+            `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=en-US&page=1`,
+        );
+        const data = await res.json();
 
-    const paths = data.results.map((movie: Movie) => ({
-        params: { id: movie.id.toString() },
-    }));
+        const paths = data.results.map((movie: Movie) => ({
+            params: { id: movie.id.toString() },
+        }));
 
-    return {
-        paths,
-        fallback: true, // Allows rendering movie pages dynamically at runtime for non-prebuilt paths
-    };
+        return {
+            paths,
+            fallback: true,
+        };
+    } catch (error) {
+        console.error('Error generating static paths:', error);
+        return {
+            paths: [],
+            fallback: true,
+        };
+    }
 };
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
@@ -112,9 +118,9 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
         const movie = await res.json();
 
-        // Defensive check for required fields
-        if (!movie || typeof movie.id === 'undefined' || !Array.isArray(movie.genres)) {
-            return { props: { movie: null, error: 'Invalid movie data received' } };
+        // Only validate essential fields
+        if (!movie || typeof movie.id !== 'number' || !movie.title) {
+            return { props: { movie: null, error: 'Invalid movie structure returned from API' } };
         }
 
         return { props: { movie } };
