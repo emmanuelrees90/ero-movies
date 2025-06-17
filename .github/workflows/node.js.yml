@@ -19,27 +19,29 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout 🛎️
+      - name: 🛎️ Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js ⚙️ - Cache dependencies ⚡ - Install dependencies 🔧
-        uses: ./.github/workflows/setup-node
-
-      - name: Setup Pages ⚙️
-        uses: actions/configure-pages@v4
+      - name: ⚙️ Setup Node.js and install dependencies
+        uses: actions/setup-node@v4
         with:
-          static_site_generator: next
+          node-version: '20'
+          cache: 'npm'
 
-      - name: Build and Export Next.js site 🏗️
-        run: |
-          npx next build
-          npx next export
+      - name: 📦 Install dependencies
+        run: npm ci
 
-      - name: Upload artifact 📡
+      - name: ⚙️ Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: 🏗️ Build static site (Next.js with output: export)
+        run: npm run build
+
+      - name: 📡 Upload static export to GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./out
-
+          path: out
+          
   deploy:
     environment:
       name: github-pages
@@ -49,6 +51,6 @@ jobs:
     needs: build
 
     steps:
-      - name: Publish to GitHub Pages 🚀
+      - name: 🚀 Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
