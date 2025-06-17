@@ -14,7 +14,7 @@ export default function MovieDetailsPage({ movie, error }: MovieDetailsPageProps
     if (error) {
         return (
             <div className="p-6 text-center text-red-600">
-                <h1>Error</h1>
+                <h1 className="text-2xl font-semibold">Error</h1>
                 <p>{error}</p>
             </div>
         );
@@ -33,46 +33,60 @@ export default function MovieDetailsPage({ movie, error }: MovieDetailsPageProps
             <Head>
                 <title>{movie.title} | Movie Explorer</title>
             </Head>
-            <div className="max-w-7xl mx-auto p-6 flex flex-col md:flex-row gap-6">
-                <Image
-                    src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                    alt={movie.title}
-                    width={320}
-                    height={480}
-                    className="w-full md:w-64 rounded-lg shadow object-cover"
-                    priority
-                />
-                <div>
-                    <h1 className="text-3xl font-bold text-blue-600">{movie.title}</h1>
-                    <p className="text-gray-500 mt-1">
-                        Released: {movie.release_date} | Runtime: {movie.runtime} mins
-                    </p>
-                    <p className="text-yellow-500 mt-1">⭐ {movie.vote_average?.toFixed(1)}</p>
 
-                    <div className="mt-2 flex gap-2 flex-wrap">
-                        {movie?.genres?.length > 0 ? (
-                            movie.genres.map(g => (
-                                <span
-                                    key={g.id}
-                                    className="bg-blue-100 text-blue-800 text-sm px-2 py-1 rounded"
-                                >
-                                    {g.name}
-                                </span>
-                            ))
-                        ) : (
-                            <span className="text-sm text-gray-400">No genres available</span>
-                        )}
+            <main className="px-4 py-6 sm:px-6 md:px-10 bg-white min-h-[80vh]">
+                <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+                    <div className="w-full flex justify-center">
+                        <Image
+                            src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                            alt={movie.title}
+                            width={320}
+                            height={480}
+                            className="rounded-lg shadow-md object-cover w-full max-w-xs"
+                            priority
+                        />
                     </div>
 
-                    <p className="mt-4 text-gray-800">{movie.overview}</p>
-                    <button
-                        onClick={() => router.back()}
-                        className="mt-6 text-sm text-blue-600 underline"
-                    >
-                        ← Back
-                    </button>
+                    <div className="md:col-span-2">
+                        <h1 className="text-3xl md:text-4xl font-bold text-blue-700 mb-2">
+                            {movie.title}
+                        </h1>
+                        <p className="text-gray-600 text-sm mb-1">
+                            <strong>Released:</strong> {movie.release_date} &nbsp; | &nbsp;
+                            <strong>Runtime:</strong> {movie.runtime} mins
+                        </p>
+                        <p className="text-yellow-500 text-base mb-2">
+                            ⭐ {movie.vote_average?.toFixed(1)}
+                        </p>
+
+                        <div className="flex flex-wrap gap-2 my-4">
+                            {movie?.genres?.length > 0 ? (
+                                movie.genres.map(g => (
+                                    <span
+                                        key={g.id}
+                                        className="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full font-medium"
+                                    >
+                                        {g.name}
+                                    </span>
+                                ))
+                            ) : (
+                                <span className="text-sm text-gray-400">No genres available</span>
+                            )}
+                        </div>
+
+                        <p className="text-gray-800 leading-relaxed text-sm md:text-base">
+                            {movie.overview}
+                        </p>
+
+                        <button
+                            onClick={() => router.back()}
+                            className="mt-6 inline-block text-sm text-blue-600 underline hover:text-blue-800"
+                        >
+                            ← Back
+                        </button>
+                    </div>
                 </div>
-            </div>
+            </main>
         </>
     );
 }
@@ -118,7 +132,6 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
         const movie = await res.json();
 
-        // Only validate essential fields
         if (!movie || typeof movie.id !== 'number' || !movie.title) {
             return { props: { movie: null, error: 'Invalid movie structure returned from API' } };
         }
