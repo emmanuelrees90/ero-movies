@@ -7,9 +7,9 @@ const nextConfig: NextConfig = {
   basePath: isProd ? '/ero-movies' : '',
   output: 'export',
   reactStrictMode: false,
-
   // ✅ Add this block at the top level
   images: {
+    unoptimized:true,
     domains: ['image.tmdb.org'],
   },
 }
